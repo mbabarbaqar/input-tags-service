@@ -1,0 +1,174 @@
+<style>
+    .simple-tags {
+        border: 1px solid #1e87f0;
+        box-sizing: border-box;
+        margin: 1em;
+        padding: 0em 0.5em;
+        display: -webkit-box;
+        display: flex;
+        flex-wrap: wrap;
+        font-size: 14px;
+        border-radius: 5px;
+    }
+
+    .simple-tags > ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: -webkit-box;
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .simple-tags ul li {
+        margin: 0.5em 0.2em;
+        padding: 0.5em;
+        color: #fff;
+        background-color: #1e87f0;
+        border-radius: 5px;
+    }
+
+    .simple-tags ul li a {
+        margin: 0.5em 0.2em;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .simple-tags input {
+        padding: 0.9em 0.5em;
+        box-sizing: border-box;
+        -webkit-box-flex: 1;
+        flex-grow: 1;
+        border: none;
+        outline: none;
+        font-size: inherit;
+        font-family: inherit;
+        color: inherit;
+    }
+
+</style>
+<section>
+    <label class="input">
+        <input type="hidden" id="media_file_tags" name="media_file[tags]" class="simple-tags-field" value="Sunglasses,Head,Person,Face,Portrait,Man,Adult,Male,Necklace,Glasses,Kanye West,Cristiano Ronaldo,Billie Eilish,2020 THE CELEBRITY 100" />
+    </label>
+</section>
+
+<section>
+    <label class="input">
+        <input type="hidden" id="media_file_tags2" name="media_file2[tags]" class="simple-tags-field2" value="Sunglasses,Head" />
+    </label>
+</section>
+
+<section>
+    <label class="input">
+        <input type="hidden" name="media_file2[tags]" class="simple-tags-field3" value="Sunglasses,Head,test" />
+    </label>
+</section>
+
+<script type="text/javascript">
+
+    function Tags(querySelector) {
+        var DOMInputField = document.querySelector(querySelector);
+        var key = Math.random().toString(36).slice(2, 7);
+
+        var selectedTags = DOMInputField.value;
+        DOMInputField.parentElement.insertAdjacentHTML('beforeend','<div id="simple-tags-container-'+key+'" class="simple-tags" data-simple-tags="'+selectedTags+'"></div>');
+        var DOMParent = document.getElementById('simple-tags-container-' + key);
+
+        var DOMList;
+        var DOMInput;
+        var dataAttribute;
+        var arrayOfList = [];
+
+        function DOMCreate() {
+            var ul = document.createElement('ul');
+            var li = document.createElement('li');
+            var input = document.createElement('input');
+            DOMParent.appendChild(ul);
+            DOMParent.appendChild(input); // first child is <ul>
+
+            DOMList = DOMParent.firstElementChild; // last child is <input>
+
+            DOMInput = DOMParent.lastElementChild;
+        }
+
+        function DOMRender() {
+            //# clear the entire <li> inside <ul>
+            DOMList.innerHTML = ''; // render each <li> to <ul>
+
+            arrayOfList.forEach(function (currentValue, index) {
+                var li = document.createElement('li');
+                li.innerHTML = "".concat(currentValue, " <a>&times;</a>");
+
+                li.querySelector('a').addEventListener('click', function () {
+                    onDelete(index);
+                    return false;
+                });
+
+                DOMList.appendChild(li);
+                console.log("Delete");
+
+            });
+            setAttribute();
+        }
+
+        function onKeyUp() {
+            DOMInput.addEventListener('keyup', function (event) {
+                var text = this.value.trim(); // check if ',' or 'enter' key was press
+
+                if (text.includes(',') || event.keyCode == 13) {
+                    //# check if empty text when ',' is remove
+                    if (text.replace(',', '') != '') {
+                        //# push to array and remove ','
+                        arrayOfList.push(text.replace(',', ''));
+                    } //# clear input
+
+
+                    this.value = '';
+                }
+
+                DOMRender();
+            });
+        }
+
+        function onDelete(id) {
+            arrayOfList = arrayOfList.filter(function (currentValue, index) {
+                if (index == id) {
+                    return false;
+                }
+
+                return currentValue;
+            });
+
+            DOMRender();
+        }
+
+        function getAttribute() {
+            dataAttribute = DOMParent.getAttribute('data-simple-tags');
+            if (dataAttribute) {
+                dataAttribute = dataAttribute.split(','); // store array of data attribute in arrayOfList
+                arrayOfList = dataAttribute.map(function (currentValue) {
+                    return currentValue.trim();
+                });
+            }
+        }
+
+        function setAttribute() {
+            DOMParent.setAttribute('data-simple-tags', arrayOfList.toString());
+            DOMInputField.value = arrayOfList.toString();
+        }
+
+        getAttribute();
+        DOMCreate();
+        DOMRender();
+        onKeyUp();
+    } //# run immediately
+
+
+    (function () {
+        new Tags('.simple-tags-field');
+        new Tags('.simple-tags-field2');
+        new Tags('.simple-tags-field3');
+    })();
+
+</script>
